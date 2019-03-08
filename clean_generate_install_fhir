@@ -1,0 +1,18 @@
+#!/usr/bin/env sh
+
+generatedPatientSize=10
+outputFolder="./output/fhir_r4"
+fhirServer="http://localhost:8080/fhir"
+
+printf "\nCleaning output folder\n"
+rm -Rv $outputFolder/*
+
+printf "\n./run_synthea -P $generatedPatientSize California"
+./run_synthea -P $generatedPatientSize California
+
+printf "\nUploading generated data to FHIR Server : $fhirServer\n"
+for file in $outputFolder/*
+do
+    printf "\ncurl $fhirServer --data-binary \"@$file\" -H \"Content-Type: application/fhir+json\"\n"
+    curl $fhirServer --data-binary "@$file" -H "Content-Type: application/fhir+json"
+done;
